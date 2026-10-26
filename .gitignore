@@ -1,0 +1,9 @@
+# ESPHome build artefacts
+.esphome/
+__pycache__/
+*.pyc
+*.pyo
+
+# Secrets and local overrides
+secrets.yaml
+!.gitignore

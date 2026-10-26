@@ -1,0 +1,88 @@
+# Complete working example: salvaged CO2-C18S + XZ-JC001-B (SHT4x) on an ESP32-C6.
+#
+# Both boards come out of the same Tuya CO2 monitor (e.g. Moes BSS-X-CO2-U).
+# Verified with ESPHome 2026.9.0 on an ESP32-C6 Super Mini.
+
+substitutions:
+  device_name: air-sense-co2
+  device_friendly_name: Air Sense CO2
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${device_friendly_name}
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/w-wie-waldi/esphome-cubic-co2
+      ref: main
+    components: [cubic_co2]
+
+esp32:
+  board: esp32-c6-devkitc-1
+  framework:
+    type: esp-idf
+
+# keep the USB console quiet if the sensor sits on GPIO16/17
+logger:
+  baud_rate: 0
+
+api:
+
+ota:
+  - platform: esphome
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: ${device_name} fallback
+    password: !secret ap_password
+
+# --- CO2 module (UART) -------------------------------------------------------
+uart:
+  - id: co2_uart
+    rx_pin: GPIO18
+    tx_pin: GPIO19
+    baud_rate: 9600
+
+# --- T/RH board (I2C, SHT4x @ 0x44) ------------------------------------------
+i2c:
+  sda: GPIO4
+  scl: GPIO5
+  scan: false
+
+sensor:
+  - platform: cubic_co2
+    uart_id: co2_uart
+    name: CO2
+    id: co2_ppm
+    filters:
+      # - offset: -35      # uncomment after a fresh-air reference test
+      # - throttle: 30s    # publish less often, if you want smaller graphs
+      - sliding_window_moving_average:
+          window_size: 5
+          send_every: 1
+
+  - platform: sht4x
+    address: 0x44
+    temperature:
+      name: Temperatur
+      icon: mdi:thermometer
+      filters:
+        # the board sits next to the CO2 electronics, which warms it slightly
+        - offset: 0.0
+    humidity:
+      name: Luftfeuchtigkeit
+      icon: mdi:water
+    update_interval: 30s
+
+# --- optional: ventilate reminder --------------------------------------------
+binary_sensor:
+  - platform: template
+    name: CO2 hoch
+    lambda: |-
+      return id(co2_ppm).state > 1200;
+    filters:
+      - delayed_on: 2min
+      - delayed_off: 10min
