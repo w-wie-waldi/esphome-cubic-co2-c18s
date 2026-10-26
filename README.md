@@ -2,8 +2,8 @@
 
 ESPHome component for the **Cubic CO2-C18S** NDIR module found inside cheap Tuya
 CO₂ monitors (e.g. **Moes BSS-X-CO2-U**). No built-in ESPHome platform speaks its
-protocol — the module streams frames on its own instead of answering queries —
-so this component exists. Stock firmware, nothing to flash on the module.
+protocol so this component exists. The module streams frames on its own instead of
+answering queries. Stock firmware, nothing to flash on the module.
 
 ```
 [D][cubic_co2:058]: CO2: 847 ppm
@@ -11,6 +11,8 @@ so this component exists. Stock firmware, nothing to flash on the module.
 ```
 
 ## Hardware
+
+<img src="docs/image-2.jpg" width="45%"> <img src="docs/image.jpg" width="45%">
 
 Modules labelled **`CO2-C18S`** or **`CO2-C18S_V6A`**. They ship in many Tuya-based
 CO₂ monitors under different brand names — Wi-Fi or BLE host makes no difference.
