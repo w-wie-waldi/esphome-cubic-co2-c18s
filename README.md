@@ -44,7 +44,7 @@ Avoid `GPIO16`/`GPIO17` on ESP32-C6 — USB console pins. Otherwise any free GPI
 external_components:
   - source:
       type: git
-      url: https://github.com/w-wie-waldi/esphome-cubic-co2
+      url: https://github.com/w-wie-waldi/esphome-cubic-co2-c18s
       ref: main
     components: [cubic_co2]
 ```
